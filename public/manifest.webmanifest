@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "StrategieSpiel",
+  "short_name": "StrategieSpiel",
+  "description": "Rundenbasiertes Strategiespiel von Nicolas Brand: erkunde die Karte, gründe Städte, erforsche Techniken und erobere die Welt.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1a2b",
+  "theme_color": "#0e1a2b",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "strategiespiel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "StrategieSpiel – rundenbasiertes Strategiespiel im Browser (eigene Umsetzung nach dem Vorbild von Polytopia)",
+  "author": "Nicolas Brand",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "node --test",
+    "sim": "node tools/sim.mjs",
+    "icons": "node tools/make-icons.mjs"
+  }
+}

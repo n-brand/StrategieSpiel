@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <!-- viewport-fit=cover: auf dem iPhone bis unter Notch und Home-Leiste zeichnen (Abstände über env(safe-area-inset-*)) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>StrategieSpiel</title>
+  <meta name="description" content="StrategieSpiel – rundenbasiertes Strategiespiel von Nicolas Brand: erkunde die Karte, gründe Städte, erforsche Techniken und erobere die Welt.">
+  <meta name="author" content="Nicolas Brand">
+  <meta name="theme-color" content="#0e1a2b">
+  <!-- Als App auf dem Home-Bildschirm (iOS): Vollbild ohne Safari-Leiste -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="StrategieSpiel">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <script>
+    // Theme vor dem ersten Zeichnen setzen (kein Aufblitzen). Standard: dunkel – wie im GameHub.
+    try {
+      if (localStorage.getItem('kleine-reiche-theme') === 'light') document.documentElement.dataset.theme = 'light';
+    } catch {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Three.js für die 3D-Karte: ohne Build-Schritt über jsDelivr, der Service Worker hält es offline bereit -->
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js" } }
+  </script>
+</head>
+<body>
+  <main id="app" class="app">
+    <div class="boot" id="boot"><span class="logo">Strategie<span>Spiel</span></span><p>Lädt …</p></div>
+  </main>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
