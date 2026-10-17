@@ -86,8 +86,11 @@ auf allen Kartentypen.
 
 ## GitHub Pages
 
-- Einmalig im Repo einstellen: Settings → Pages → Source „GitHub
-  Actions“. Danach veröffentlicht jeder Push auf `main` automatisch.
+- Eingestellt (Settings → Pages → Source „GitHub Actions“, nicht „Deploy
+  from a branch“): Jeder Push auf `main` veröffentlicht automatisch. Online
+  getestet am 2026-10-17 – Spiel startet, Service Worker aktiv.
+- Schlägt `configure-pages` mit „Not Found“ fehl, ist Pages aus oder nicht
+  auf „GitHub Actions“ gestellt; danach den Lauf neu starten.
 - Alle Pfade sind relativ (`./`, `sw.js`, `icons/…`), daher läuft das Spiel
   auch unter `/StrategieSpiel/`.
 
@@ -167,7 +170,6 @@ auf allen Kartentypen.
 
 ## Offen
 
-- GitHub Pages im Repo einschalten (siehe oben), dann Link testen.
 - 3D-Look weiter an den Stil des Originals annähern (Figuren sind
   erledigt; Karte, Bäume, Städte offen). Keine Original-Grafiken
   übernehmen, nur den Stil.
