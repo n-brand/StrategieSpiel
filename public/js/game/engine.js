@@ -524,6 +524,8 @@ export function capture(s, unitId) {
     city.pending = [];
     for (const o of s.units) if (o.home === city.id) o.home = null;
   }
+  // Die Einheit zieht in die eingenommene Stadt: Platz in der alten Stadt wird frei
+  u.home = city.id;
   events.push({ type: 'capture', city: city.id, from, by: u.owner, x: city.x, y: city.y, village: target.kind === 'village' });
   reveal(s, u.owner, city.x, city.y, city.border + 1, events);
   u.done = u.moved = u.attacked = true;

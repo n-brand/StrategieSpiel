@@ -316,6 +316,20 @@ describe('Wasser und Schiffe', () => {
 });
 
 describe('Einnehmen', () => {
+  test('Einheit gehört danach zur eingenommenen Stadt, alte Stadt hat wieder Platz', () => {
+    const s = world();
+    const home = s.cities[0];
+    E.at(s, 4, 4).village = true;
+    const u = unit(s, 0, 'warrior', 4, 4);
+    u.home = home.id;
+    assert.equal(E.cityUnits(s, home).length, 1);
+    E.capture(s, u.id);
+    const city = E.cityAt(s, 4, 4);
+    assert.equal(u.home, city.id);
+    assert.equal(E.cityUnits(s, home).length, 0);
+    assert.equal(E.cityUnits(s, city).length, 1);
+  });
+
   test('Dorf: erst in der Runde nach dem Hinziehen; neue Stadt mit 3×3 Gebiet', () => {
     const s = world();
     E.at(s, 4, 4).village = true;
