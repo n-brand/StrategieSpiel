@@ -245,7 +245,6 @@ function startGame(s) {
         <div class="hud-spacer"></div>
         <div class="hud-box" data-score></div>
       </header>
-      <div class="hint" data-hint hidden></div>
       <div class="sheet" data-sheet hidden></div>
       <div class="ai-banner" data-ai hidden></div>
       <footer class="dock">
@@ -259,7 +258,6 @@ function startGame(s) {
     stars: root.querySelector('[data-stars]'),
     turn: root.querySelector('[data-turn]'),
     score: root.querySelector('[data-score]'),
-    hint: root.querySelector('[data-hint]'),
     sheet: root.querySelector('[data-sheet]'),
     ai: root.querySelector('[data-ai]'),
     end: root.querySelector('[data-end]'),
@@ -312,11 +310,6 @@ function updateHud() {
   dom.end.disabled = !isHumanTurn() || busy;
 }
 
-function setHint(text) {
-  dom.hint.hidden = !text;
-  dom.hint.textContent = text || '';
-}
-
 // ---------- Auswahl ----------
 
 const selectedUnit = () => (selection?.kind === 'unit' ? E.unitById(game, selection.id) : null);
@@ -338,25 +331,24 @@ function refreshSelection() {
       attacks: mine ? E.attackTargets(game, u) : [],
       converts: mine ? E.convertTargets(game, u) : [],
     });
-    setHint(mine ? unitHint(u) : '');
   } else if (selection?.kind === 'tile') {
     board.setHighlights({ select: selection });
-    setHint('');
   } else {
     board.setHighlights({});
-    setHint('');
   }
   renderSheet();
   board.syncUnits();
 }
 
-// Hinweis oben: nur nennen, was gerade wirklich geht – sonst sagen, warum nichts geht
+// Anweisung in der Auswahl-Karte: nur nennen, was gerade wirklich geht – sonst sagen, warum nichts geht
+const DOT_MOVE = '<i class="mark mark--move"></i>';
+const DOT_ATTACK = '<i class="mark mark--attack"></i>';
 function unitHint(u) {
   const moves = E.canMove(u) && E.moveTargets(game, u).length > 0;
   const attacks = E.canAttack(u) && E.attackTargets(game, u).length > 0;
-  if (moves && attacks) return 'Weiß = ziehen · Rot = angreifen';
-  if (moves) return 'Weiß = ziehen';
-  if (attacks) return 'Rot = angreifen';
+  if (moves && attacks) return `${DOT_MOVE} ziehen · ${DOT_ATTACK} angreifen`;
+  if (moves) return `Tippe auf ${DOT_MOVE}, um zu ziehen`;
+  if (attacks) return `Tippe auf ${DOT_ATTACK}, um anzugreifen`;
   if (!E.isIdle(game, u)) return 'Schon gezogen – nächste Runde geht es weiter';
   if (E.canAct(u)) return 'Kein freies Feld in Reichweite';
   return '';
@@ -399,7 +391,6 @@ async function act(fn, keepUnit = null) {
   if (busy) return;
   busy = true;
   board.setHighlights({});
-  setHint('');
   const events = fn();
   await board.play(events, { speed: 1 });
   busy = false;
@@ -442,6 +433,11 @@ function afterHumanAction() {
 
 const infoBtn = `<button type="button" class="sheet-info" data-sheet-info aria-label="Details">${ICONS.info}</button>`;
 const closeBtn = `<button type="button" class="sheet-close" data-sheet-close aria-label="Schließen">${ICONS.close}</button>`;
+const foldBtn = `<button type="button" class="sheet-fold" data-sheet-fold aria-label="Einklappen">${ICONS.chevron}</button>`;
+// Eingeklappt bleibt die Karte, solange dasselbe ausgewählt ist (auch nach einem Zug)
+let sheetFolded = false;
+let sheetKey = '';
+const selectionKey = () => (selection?.kind === 'unit' ? `u${selection.id}` : `t${selection.x},${selection.y}`);
 
 function renderSheet() {
   const sheet = dom.sheet;
@@ -450,26 +446,44 @@ function renderSheet() {
     dom.root.classList.remove('has-sheet');
     return;
   }
+  if (selectionKey() !== sheetKey) sheetFolded = false;
+  sheetKey = selectionKey();
   let html = '';
   let color = 'var(--line)';
+  let hint = '';
   const u = selectedUnit();
   if (u) {
     const tribe = tribeById(game.players[u.owner].tribe);
     color = tribe.color;
     html = unitSheet(u, tribe);
+    if (u.owner === HUMAN && isHumanTurn()) hint = unitHint(u);
   } else {
     const tile = E.at(game, selection.x, selection.y);
     const city = tile.city != null ? E.cityById(game, tile.city) : null;
     if (city) {
       color = tribeById(game.players[city.owner].tribe).color;
       html = citySheet(city);
-    } else html = tileSheet(tile);
+      if (city.owner === HUMAN && isHumanTurn()) hint = 'Wähle eine Einheit zum Ausbilden';
+    } else {
+      html = tileSheet(tile);
+      if (E.tileOwner(game, tile) === HUMAN && isHumanTurn() && E.tileActions(game, HUMAN, tile).some((a) => !a.locked)) hint = 'Wähle, was hier entstehen soll';
+    }
   }
   sheet.style.setProperty('--c', color);
-  sheet.innerHTML = infoBtn + closeBtn + html;
+  sheet.innerHTML = infoBtn + foldBtn + closeBtn + html;
+  if (hint) sheet.querySelector('.sheet-head > div').insertAdjacentHTML('beforeend', `<p class="sheet-hint">${hint}</p>`);
+  sheet.classList.toggle('is-folded', sheetFolded);
   sheet.hidden = false;
   dom.root.classList.add('has-sheet'); // Handy hochkant: Karte ersetzt die untere Leiste
   sheet.querySelector('[data-sheet-close]').addEventListener('click', () => select(null));
+  // Einklappen: nur Kopfzeile bleibt, Antippen der Kopfzeile klappt wieder auf
+  const fold = (on) => {
+    sheetFolded = on;
+    sheet.classList.toggle('is-folded', on);
+    sheet.querySelector('[data-sheet-fold]').setAttribute('aria-label', on ? 'Aufklappen' : 'Einklappen');
+  };
+  sheet.querySelector('[data-sheet-fold]').addEventListener('click', () => fold(!sheetFolded));
+  sheet.querySelector('.sheet-head').addEventListener('click', () => sheetFolded && fold(false));
   // Handy hochkant: Werte und Hinweise stehen hinter dem Info-Knopf, die Karte bleibt klein
   sheet.querySelector('[data-sheet-info]').addEventListener('click', () => {
     openModal(`<h2>${esc(sheet.querySelector('.sheet-head h2').textContent)}</h2>${sheet.querySelector('.sheet-detail')?.innerHTML ?? ''}`, { className: 'modal--info' });
@@ -489,7 +503,7 @@ function unitSheet(u, tribe) {
   const head = `
     <div class="sheet-head">
       <img src="${unitThumb(u.naval || u.type, tribe.id)}" alt="">
-      <div><h2>${esc(E.unitName(u))}${u.veteran ? ' ★' : ''}</h2><p>${esc(tribe.name)} · ${u.hp}/${u.maxHp} Lebenspunkte</p></div>
+      <div><h2>${esc(E.unitName(u))}${u.veteran ? ' ★' : ''}</h2><p>${esc(tribe.name)} · <span class="hp" title="Lebenspunkte">${ICONS.heart}${u.hp}/${u.maxHp}</span></p></div>
     </div>`;
   const stats = `<div class="stats">${statPill('Angriff', fmt(def.atk))}${statPill('Abwehr', def.def)}${statPill('Bewegung', def.move)}${u.naval ? '' : statPill('Straße', E.roadRange(u))}${statPill('Reichweite', def.range)}${u.kills ? statPill('Siege', u.kills) : ''}</div>`;
   const naval = u.naval
@@ -545,7 +559,7 @@ function citySheet(city) {
   if (!mine || !isHumanTurn()) return html;
   if (city.pending.length) html += `<div class="actions">${actionButton('reward', city.id, ICONS.up, 'Belohnung wählen', `Stufe ${city.pending[0]}`, true)}</div>`;
   const opts = E.trainOptions(game, city);
-  html += `<p class="sheet-note sheet-label">Einheit ausbilden:</p><div class="actions">${opts
+  html += `<div class="actions">${opts
     .filter((o) => !o.locked) // nur Freigeschaltetes
     .map((o) => {
       const sub = o.locked ? `${ICONS.lock} ${esc(o.reason.replace('Braucht ', ''))}` : `<span class="cost">${starAmount(o.cost)}</span>${o.ok ? '' : ` · ${esc(o.reason)}`}`;

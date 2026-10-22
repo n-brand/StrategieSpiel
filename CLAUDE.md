@@ -171,6 +171,9 @@ auf allen Kartentypen.
     und Hinweise (`.sheet-detail`) stehen hinter dem ⓘ-Knopf und öffnen
     sich als Fenster; quer und am PC stehen sie wie bisher in der Karte.
   - Aktionen als runde Symbol-Knöpfe mit Name und Preis darunter.
+  - Anweisung („Tippe auf ⚪, um zu ziehen“) steht in der Karte statt als
+    Blase oben. Pfeil ⌄ klappt die Karte auf die Kopfzeile ein.
+  - Lebenspunkte als Herz-Symbol statt Wort.
   - Forschungsdetails: Freischaltungen einklappbar (am PC offen).
   - Mehr Symbole statt Text: Hilfe als Symbolzeilen, Menü-Einstellungen
     mit Symbolen, Gegner-Tempo 1×/2×/4×, Fähigkeiten mit Symbol.
@@ -193,11 +196,12 @@ Ungefähr nach Nutzen sortiert:
 1. ~~Untere Leiste bei Auswahl ersetzen~~ – erledigt: Auf dem Handy
    hochkant blendet eine Auswahl „Forschung/Runde beenden“ aus
    (`.has-sheet`), die Karte rückt nach unten.
-2. **Anweisung in der Auswahl-Karte:** Statt der Blase „Weiß = ziehen“ oben
-   steht im Original eine Zeile in der Karte („Wähle ein Feld …“). Eine
-   Zeile spart die Blase und erklärt den nächsten Schritt.
-3. **Karte einklappen (Pfeil ⌄):** Die Infozeile lässt sich zuklappen, ohne
-   die Auswahl zu verlieren. So sieht man die Ziele dahinter.
+2. ~~Anweisung in der Auswahl-Karte~~ – erledigt: `.sheet-hint` unter dem
+   Namen (`unitHint`, mit Punkt/Ring-Symbol), auch bei Stadt und Feld. Die
+   Blase oben gibt es nicht mehr.
+3. ~~Karte einklappen~~ – erledigt: Pfeil ⌄ (`.is-folded`), nur die
+   Kopfzeile bleibt; Antippen der Kopfzeile klappt auf. Bleibt eingeklappt,
+   solange dieselbe Auswahl gilt.
 4. **Untere Leiste als runde Symbol-Knöpfe mit Beschriftung:** Menü,
    Statistik, Forschung, Runde beenden. Das Menü wandert von oben nach
    unten, die obere Leiste zeigt dann nur Zahlen.

@@ -468,11 +468,11 @@ button { font: inherit; color: inherit; }
 @keyframes sheet-in {
   from { transform: translateY(12px); opacity: 0; }
 }
-.sheet-head { display: flex; align-items: center; gap: 10px; padding-right: 74px; }
+.sheet-head { display: flex; align-items: center; gap: 10px; padding-right: 110px; }
 .sheet-head img { width: 40px; height: 40px; flex: none; border-radius: 12px; background: var(--card-2); }
 .sheet-head h2 { margin: 0; font-size: 1.05rem; font-weight: 900; line-height: 1.15; }
 .sheet-head p { margin: 2px 0 0; color: var(--muted); font-size: 0.85rem; font-weight: 700; }
-.sheet-close, .sheet-info {
+.sheet-close, .sheet-info, .sheet-fold {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -487,8 +487,22 @@ button { font: inherit; color: inherit; }
   color: var(--muted);
   cursor: pointer;
 }
-.sheet-info { right: 42px; }
-.sheet-close svg, .sheet-info svg { width: 20px; height: 20px; }
+.sheet-fold { right: 42px; }
+.sheet-info { right: 78px; }
+.sheet-close svg, .sheet-info svg, .sheet-fold svg { width: 20px; height: 20px; }
+.sheet-fold svg { transition: transform 0.18s; }
+/* Anweisung unter dem Namen (früher Blase oben) */
+.sheet-hint { margin: 3px 0 0; color: var(--yellow); font-size: 0.82rem; font-weight: 800; line-height: 1.25; }
+:root[data-theme="light"] .sheet-hint { color: #b35c00; }
+.mark { display: inline-block; width: 11px; height: 11px; margin: 0 1px; border-radius: 50%; vertical-align: -1px; }
+.sheet-head .hp { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.sheet-head .hp svg { width: 14px; height: 14px; color: #fa5252; }
+.mark--move { background: #fff; box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.35); }
+.mark--attack { border: 2.5px solid #fa5252; }
+/* Eingeklappt: nur die Kopfzeile, Pfeil zeigt nach oben */
+.sheet.is-folded > :not(.sheet-head):not(button), .sheet.is-folded .sheet-hint { display: none; }
+.sheet.is-folded .sheet-head { cursor: pointer; }
+.sheet.is-folded .sheet-fold svg { transform: rotate(180deg); }
 /* Handy hochkant: Werte und Hinweise nur über den Info-Knopf, Karte bleibt klein */
 .sheet .sheet-detail, .sheet .sheet-label { display: none; }
 /* Handy hochkant: Bei einer Auswahl verschwindet die untere Leiste, die Karte rückt nach unten */
@@ -563,24 +577,6 @@ button { font: inherit; color: inherit; }
 .progress { display: flex; gap: 3px; margin-top: 8px; }
 .progress span { flex: 1; height: 8px; border-radius: 4px; background: var(--card-2); box-shadow: inset 0 0 0 2px var(--line); }
 .progress span.is-full { background: var(--yellow); box-shadow: none; }
-
-/* Hinweis-Blase oben (z. B. „Wähle ein Ziel“) */
-.hint {
-  position: absolute;
-  top: calc(var(--sat) + 58px);
-  left: 50%;
-  z-index: 3;
-  max-width: calc(100% - 24px);
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: var(--glass);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  font-size: 0.88rem;
-  font-weight: 800;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
 
 /* Zug der Computergegner */
 .ai-banner {
@@ -986,11 +982,12 @@ button { font: inherit; color: inherit; }
     width: min(330px, 46vw);
     max-height: none;
   }
-  .sheet .sheet-detail, .sheet .sheet-label { display: block; }
+  .sheet .sheet-detail { display: block; }
   .sheet-info { display: none; }
   .has-sheet .dock { display: flex; }
   .has-sheet .sheet { bottom: calc(var(--sab) + 66px); }
-  .sheet-head { padding-right: 34px; }
+  .sheet-head { padding-right: 74px; }
+  .sheet-fold { right: 42px; }
   .actions { gap: 8px; }
   .dock .btn { min-height: 42px; }
   .modal { max-width: 640px; border-radius: 24px 24px 0 0; }
@@ -1025,11 +1022,12 @@ button { font: inherit; color: inherit; }
     height: max-content;
     max-height: calc(100dvh - 76px - 96px);
   }
-  .sheet .sheet-detail, .sheet .sheet-label { display: block; }
+  .sheet .sheet-detail { display: block; }
   .sheet-info { display: none; }
   .has-sheet .dock { display: flex; }
   .has-sheet .sheet { bottom: 96px; }
-  .sheet-head { padding-right: 34px; }
+  .sheet-head { padding-right: 74px; }
+  .sheet-fold { right: 42px; }
   .modal-backdrop { align-items: center; padding: 24px; }
   .modal { width: min(100%, 560px); border-radius: 24px; padding: 26px; box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25); }
   .modal--menu { width: min(100%, 400px); padding: 22px; }
