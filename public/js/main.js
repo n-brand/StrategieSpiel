@@ -477,6 +477,7 @@ function renderSheet() {
 
 // Wert mit Symbol statt Wort; das Wort steht im Tooltip und für Screenreader
 const STAT_ICON = { Angriff: 'sword', Abwehr: 'shield', Bewegung: 'boot', Straße: 'road', Reichweite: 'target', Siege: 'swords', Einwohner: 'people', Einkommen: 'star', Einheiten: 'pawn' };
+const SKILL_ICON = { dash: 'bolt', escape: 'boot', persist: 'swords', fortify: 'shield', heal: 'heart', convert: 'sparkle' };
 const statPill = (label, value) =>
   `<span class="stat" data-stat="${STAT_ICON[label]}" title="${label}">${ICONS[STAT_ICON[label]]}<span class="vh">${label} </span><b>${value}</b></span>`;
 
@@ -492,7 +493,14 @@ function unitSheet(u, tribe) {
   const naval = u.naval
     ? `<p class="sheet-note">${u.naval === 'boat' ? 'Boote fahren nur auf Flachwasser.' : 'Fährt auch auf dem Ozean.'} Zum Anlanden auf ein Landfeld ziehen – das beendet den Zug.</p>`
     : '';
-  const skills = def.skills.length ? `<p class="sheet-note">${def.skills.map((k) => esc(SKILL_NAMES[k])).join(' · ')}</p>` : '';
+  const skills = def.skills.length
+    ? `<ul class="skill-list">${def.skills
+        .map((k) => {
+          const [name, text] = SKILL_NAMES[k].split(': ');
+          return `<li>${ICONS[SKILL_ICON[k]]}<span><b>${esc(name)}</b> ${esc(text)}</span></li>`;
+        })
+        .join('')}</ul>`
+    : '';
   const detail = (more = '') => `<div class="sheet-detail">${stats}${naval}${skills}${more}</div>`;
   if (!mine || !isHumanTurn()) return head + detail();
   const actions = [];
@@ -506,7 +514,7 @@ function unitSheet(u, tribe) {
   if (E.canPromote(u)) actions.push(actionButton('promote', null, ICONS.up, 'Befördern', '+5 Lebenspunkte', true));
   if (E.canHealOthers(game, u)) actions.push(actionButton('healothers', null, ICONS.heart, 'Heilen', 'Nachbarn +4'));
   if (E.canRecover(game, u)) actions.push(actionButton('recover', null, ICONS.heart, 'Erholen', E.tileOwner(game, E.at(game, u.x, u.y)) === HUMAN ? '+4 Lebenspunkte' : '+2 Lebenspunkte'));
-  actions.push(actionButton('disband', null, ICONS.trash, 'Auflösen', 'Einheit entlassen'));
+  if (E.canDisband(game, u)) actions.push(actionButton('disband', null, ICONS.trash, 'Auflösen', 'Einheit entlassen'));
   const status = !E.isIdle(game, u) ? '<p class="sheet-note">Diese Einheit hat in dieser Runde schon gehandelt.</p>' : '';
   const guard = E.defenseInfo(game, u);
   const guarded = guard ? `<p class="sheet-note sheet-guard">${ICONS.shield} Geschützt (${guard.reason}): Verteidigung ×${String(guard.factor).replace('.', ',')} – weniger Schaden, stärkerer Gegenschlag.</p>` : '';
@@ -778,11 +786,11 @@ function showGameOver() {
 // ---------- Menü ----------
 
 function openMenu() {
-  const speeds = [['1', 'Normal'], ['2.2', 'Schnell'], ['4.5', 'Sehr schnell']];
+  const speeds = [['1', '1×'], ['2.2', '2×'], ['4.5', '4×']];
   const speedNow = speeds.reduce((best, [v]) => (Math.abs(Number(v) - settings.speed) < Math.abs(Number(best) - settings.speed) ? v : best), '2.2');
   const light = document.documentElement.dataset.theme === 'light';
-  const toggle = (key, label) =>
-    `<label class="set-row"><span>${label}</span><input type="checkbox" class="switch" data-set="${key}" ${settings[key] ? 'checked' : ''}></label>`;
+  const toggle = (key, label, icon) =>
+    `<label class="set-row"><span class="set-label">${icon}${label}</span><input type="checkbox" class="switch" data-set="${key}" ${settings[key] ? 'checked' : ''}></label>`;
   const seg = (key, options, value) =>
     `<div class="seg seg--sm" role="group" data-seg="${key}">${options
       .map(([v, label]) => `<button type="button" data-value="${v}" class="${v === value ? 'is-active' : ''}">${label}</button>`)
@@ -794,12 +802,12 @@ function openMenu() {
       <button type="button" class="btn" data-help>So wird gespielt</button>
     </div>
     <div class="menu-settings">
-      ${toggle('sound', 'Töne')}
-      ${toggle('music', 'Musik')}
-      ${toggle('shadows', 'Schatten')}
-      ${toggle('confirmEnd', 'Runde beenden bestätigen')}
-      <div class="set-row"><span>Design</span>${seg('theme', [['dark', 'Dunkel'], ['light', 'Hell']], light ? 'light' : 'dark')}</div>
-      <div class="set-row"><span>Tempo der Gegner</span>${seg('speed', speeds, speedNow)}</div>
+      ${toggle('sound', 'Töne', ICONS.speaker)}
+      ${toggle('music', 'Musik', ICONS.music)}
+      ${toggle('shadows', 'Schatten', ICONS.shadow)}
+      ${toggle('confirmEnd', 'Runde beenden bestätigen', ICONS.check)}
+      <div class="set-row"><span class="set-label">${light ? ICONS.sun : ICONS.moon}Design</span>${seg('theme', [['dark', 'Dunkel'], ['light', 'Hell']], light ? 'light' : 'dark')}</div>
+      <div class="set-row" title="Tempo der Gegner"><span class="set-label">${ICONS.bolt}Tempo der Gegner</span>${seg('speed', speeds, speedNow)}</div>
     </div>
     <button type="button" class="btn btn--sm menu-home" data-home>Zum Hauptmenü</button>
     <p class="credit credit--menu">StrategieSpiel · von Nicolas Brand</p>`,
@@ -842,37 +850,46 @@ function openMenu() {
 }
 
 function openHelp() {
+  const row = (icon, text) => `<li><span class="help-ico">${icon}</span><span>${text}</span></li>`;
+  const stats = ['Angriff', 'Abwehr', 'Bewegung', 'Straße', 'Reichweite', 'Siege'].map((k) => `<span class="stat" data-stat="${STAT_ICON[k]}">${ICONS[STAT_ICON[k]]}${k}</span>`).join(' ');
   openModal(`
     <h2>So wird gespielt</h2>
     <div class="help">
-      <h3>Ziel</h3>
-      <p>Bei „${TURN_LIMIT} Runden“ gewinnt nach Runde ${TURN_LIMIT} die höchste Punktzahl, bei „Eroberung“ der letzte Stamm mit Städten.</p>
-      <h3>Einheiten</h3>
+      <h3>${ICONS.trophy} Ziel</h3>
       <ul>
-        <li>Tippe auf eine Einheit: weiße Punkte = ziehen, rote Ringe = angreifen.</li>
-        <li>Berge beenden die Bewegung, ebenso ein Feld neben einem Gegner. Wald bremst nicht.</li>
-        <li>Auf Bergen (mit Klettern) sieht eine Einheit 2 Felder weit statt 1 und steht geschützt.</li>
-        <li>Auf Straßen (und zwischen Städten) kommen Einheiten weiter – wie weit, steht in der Einheitenkarte unter „Straße“ (z. B. Krieger 3, Reiter 5, Ritter 6, schwere Einheiten 2). Endet die Straße, reicht der Rest noch für ein Feld.</li>
-        <li>Ein Schild an der Lebensanzeige heißt: Diese Einheit steht geschützt und verteidigt sich besser.</li>
-        <li class="help-stats">Werte in der Einheitenkarte: ${['Angriff', 'Abwehr', 'Bewegung', 'Straße', 'Reichweite', 'Siege'].map((k) => `<span class="stat" data-stat="${STAT_ICON[k]}">${ICONS[STAT_ICON[k]]}${k}</span>`).join(' ')}</li>
-        <li>Steht deine Einheit zu Rundenbeginn auf einem Dorf, kannst du es einnehmen – es wird deine Stadt.</li>
+        ${row(ICONS.trophy, `„${TURN_LIMIT} Runden“: Nach Runde ${TURN_LIMIT} gewinnt die höchste Punktzahl.`)}
+        ${row(ICONS.swords, '„Eroberung“: Der letzte Stamm mit Städten gewinnt.')}
       </ul>
-      <h3>Sterne und Städte</h3>
+      <h3>${ICONS.pawn} Einheiten</h3>
       <ul>
-        <li>Jede Stadt bringt pro Runde Sterne. Damit bildest du Einheiten aus, forschst und baust.</li>
-        <li>Tippe auf Felder in deinem Gebiet: Früchte ernten, jagen, Höfe und Minen bauen bringt Einwohner.</li>
-        <li>Genug Einwohner → die Stadt steigt auf, bringt mehr Sterne und du wählst eine Belohnung.</li>
+        ${row(ICONS.pawn, 'Antippen: <b>weiße Punkte</b> = ziehen, <b>rote Ringe</b> = angreifen.')}
+        ${row(ICONS.mountain, 'Berge und Felder neben Gegnern beenden die Bewegung. Auf Bergen (Klettern): Sicht 2, geschützt.')}
+        ${row(ICONS.road, 'Auf Straßen und zwischen Städten kommst du weiter – wie weit, steht unter „Straße“ in den Details.')}
+        ${row(ICONS.shield, 'Schild an der Lebensanzeige = geschützt, verteidigt besser.')}
+        ${row(ICONS.flag, 'Steht eine Einheit zu Rundenbeginn auf einem Dorf, wird es deine Stadt.')}
+        <li class="help-stats">${stats}</li>
       </ul>
-      <h3>Wasser und Schiffe</h3>
+      <h3>${ICONS.star} Sterne und Städte</h3>
       <ul>
-        <li>Mit Fischen baust du Häfen auf Flachwasser in deinem Gebiet. Zieht eine Einheit auf deinen Hafen, wird sie zum Boot.</li>
-        <li>Boote fahren nur auf Flachwasser. Mit Segeln rüstest du sie zum Schiff auf (auch Ozean), mit Navigation zum Schlachtschiff.</li>
-        <li>Zum Anlanden zieht das Boot auf ein Landfeld – das beendet den Zug.</li>
+        ${row(ICONS.star, 'Jede Stadt bringt Sterne pro Runde – zum Ausbilden, Forschen und Bauen.')}
+        ${row(ICONS.people, 'Felder im eigenen Gebiet antippen: Ernten, Jagen und Bauen bringen Einwohner.')}
+        ${row(ICONS.up, 'Genug Einwohner: Die Stadt steigt auf, du wählst eine Belohnung.')}
       </ul>
-      <h3>Forschung</h3>
-      <p>Jede Technik schaltet Einheiten, Gebäude oder Fähigkeiten frei. Je mehr Städte, desto teurer wird Forschung.</p>
-      <h3>Kampf</h3>
-      <p>Schaden hängt von Angriff, Abwehr und den Lebenspunkten beider Seiten ab. Geschützt steht man in eigenen Städten, im Wald (mit Bogenschießen), auf Bergen (mit Klettern) und im Wasser (mit Aquatismus): Die Verteidigung zählt dann ×1,5 – man nimmt weniger Schaden und schlägt stärker zurück. Hinter einer Stadtmauer sogar ×4.</p>
+      <h3>${ICONS.boat} Wasser und Schiffe</h3>
+      <ul>
+        ${row(ICONS.boat, 'Fischen: Hafen auf Flachwasser. Wer darauf zieht, wird zum Boot.')}
+        ${row(ICONS.up, 'Segeln: Schiff (auch Ozean). Navigation: Schlachtschiff.')}
+        ${row(ICONS.flag, 'Anlanden auf einem Landfeld beendet den Zug.')}
+      </ul>
+      <h3>${ICONS.flask} Forschung</h3>
+      <ul>
+        ${row(ICONS.flask, 'Jede Technik schaltet etwas frei. Mehr Städte = teurere Forschung.')}
+      </ul>
+      <h3>${ICONS.sword} Kampf</h3>
+      <ul>
+        ${row(ICONS.sword, 'Schaden hängt von Angriff, Abwehr und Lebenspunkten beider Seiten ab.')}
+        ${row(ICONS.shield, 'Geschützt (×1,5): in eigenen Städten, im Wald (Bogenschießen), auf Bergen (Klettern), im Wasser (Aquatismus). Hinter einer Mauer ×4.')}
+      </ul>
     </div>`);
 }
 

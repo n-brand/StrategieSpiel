@@ -143,6 +143,7 @@ export const SIGHT = 1; // so weit deckt eine Einheit beim Ziehen auf
 export const MOUNTAIN_SIGHT = 2; // auf Bergen weiter
 export const WALL_DEFENSE = 4; // Stadtmauer
 export const VETERAN_KILLS = 3;
+export const DISBAND_TECH = 'freespirit'; // Einheiten auflösen erst mit Freigeist
 export const VETERAN_HP = 5;
 export const HEAL_OWN = 4; // Erholen im eigenen Gebiet
 export const HEAL_OTHER = 2; // Erholen außerhalb
@@ -180,7 +181,7 @@ export const TECHS = {
   riding: { name: 'Reiten', tier: 1, parent: null, text: 'Reiter' },
   roads: { name: 'Straßen', tier: 2, parent: 'riding', text: 'Straßen – Einheiten kommen weiter (je nach Einheit)' },
   trade: { name: 'Handel', tier: 3, parent: 'roads', text: 'Markt (+★ je Werkstatt-Gebäude daneben)' },
-  freespirit: { name: 'Freigeist', tier: 2, parent: 'riding', text: 'Tempel' },
+  freespirit: { name: 'Freigeist', tier: 2, parent: 'riding', text: 'Tempel, Auflösen' },
   chivalry: { name: 'Ritterlichkeit', tier: 3, parent: 'freespirit', text: 'Ritter' },
 };
 

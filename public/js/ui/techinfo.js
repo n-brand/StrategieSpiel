@@ -32,7 +32,7 @@ export const TECH_ABOUT = {
   riding: 'Reiter sind schnell und können sich nach einem Angriff zurückziehen.',
   roads: 'Auf Straßen kommen deine Einheiten weiter – wie weit, hängt von der Einheit ab. Am Straßenende geht es noch ein Feld weiter.',
   trade: 'Märkte bringen jede Runde zusätzliche Sterne – je mehr Werkstätten daneben, desto mehr.',
-  freespirit: 'Tempel auf Wiesen bringen Einwohner und viele Punkte.',
+  freespirit: 'Tempel auf Wiesen bringen Einwohner und viele Punkte. Außerdem kannst du Einheiten auflösen.',
   chivalry: 'Ritter sind sehr schnell und greifen nach einem Sieg gleich noch einmal an.',
 };
 
@@ -48,6 +48,7 @@ const EFFECTS = {
   archery: [['Waldschutz', `Im Wald verteidigen sich deine Einheiten ${factor} so gut: weniger Schaden, stärkerer Gegenschlag.`]],
   aquatism: [['Wasserschutz', `Im Wasser verteidigen sich deine Einheiten ${factor} so gut: weniger Schaden, stärkerer Gegenschlag.`]],
   philosophy: [['Gelehrsamkeit', 'Jede weitere Forschung kostet ein Drittel weniger.']],
+  freespirit: [['Auflösen', 'Eigene Einheiten lassen sich entlassen, z. B. um Platz in einer Stadt zu schaffen.']],
   diplomacy: [['Botschafter', 'Die Hauptstädte aller anderen Stämme werden sofort sichtbar.']],
 };
 

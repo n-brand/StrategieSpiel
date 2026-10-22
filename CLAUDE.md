@@ -166,7 +166,16 @@ auf allen Kartentypen.
 - **KI:** Im Modus „Eroberung“ enden Computerpartien mit Sieger
   (Simulation: 4 von 4, über 24 Partien 22). Der Rundenzähler läuft dort über 30 hinaus;
   das Spielende nennt die echte Runde.
-- **Tests:** 126 Unit-Tests, Simulation ohne Regelverstöße.
+- **Handy hochkant (2026-10-22):**
+  - Auswahl-Karte kompakt: nur Bild, Name, Untertitel. Werte, Fähigkeiten
+    und Hinweise (`.sheet-detail`) stehen hinter dem ⓘ-Knopf und öffnen
+    sich als Fenster; quer und am PC stehen sie wie bisher in der Karte.
+  - Aktionen als runde Symbol-Knöpfe mit Name und Preis darunter.
+  - Forschungsdetails: Freischaltungen einklappbar (am PC offen).
+  - Mehr Symbole statt Text: Hilfe als Symbolzeilen, Menü-Einstellungen
+    mit Symbolen, Gegner-Tempo 1×/2×/4×, Fähigkeiten mit Symbol.
+- **Auflösen:** erst mit Freigeist (`DISBAND_TECH`, `canDisband`).
+- **Tests:** 127 Unit-Tests, Simulation ohne Regelverstöße.
 
 ## Offen
 
@@ -175,3 +184,49 @@ auf allen Kartentypen.
   übernehmen, nur den Stil.
 - iOS-Startbilder (`apple-touch-startup-image`) fehlen. Beim Start ist
   kurz eine einfarbige Fläche zu sehen.
+
+## Verbesserungen (Vergleich mit Original-Screenshots, 2026-10-22)
+
+Nur Aufbau und Bedienung übernehmen, keine Grafiken, Texte oder Namen.
+Ungefähr nach Nutzen sortiert:
+
+1. **Untere Leiste bei Auswahl ersetzen:** Im Original verschwindet die
+   Leiste, sobald etwas gewählt ist. Dann stehen unten nur noch Infozeile
+   und Aktionen. Bei uns liegen Karte und „Forschung/Runde beenden“
+   übereinander, das kostet rund 60 px Karte.
+2. **Anweisung in der Auswahl-Karte:** Statt der Blase „Weiß = ziehen“ oben
+   steht im Original eine Zeile in der Karte („Wähle ein Feld …“). Eine
+   Zeile spart die Blase und erklärt den nächsten Schritt.
+3. **Karte einklappen (Pfeil ⌄):** Die Infozeile lässt sich zuklappen, ohne
+   die Auswahl zu verlieren. So sieht man die Ziele dahinter.
+4. **Untere Leiste als runde Symbol-Knöpfe mit Beschriftung:** Menü,
+   Statistik, Forschung, Runde beenden. Das Menü wandert von oben nach
+   unten, die obere Leiste zeigt dann nur Zahlen.
+5. **Obere Leiste schlanker:** Im Original nur Text mit kleiner
+   Überschrift (Punkte, Sterne +Einkommen, Runde), ohne Kästen, mittig.
+   Unsere Kästen sind gut lesbar, verdecken aber mehr.
+6. **Neuer Bildschirm Statistik (im Spiel):** Spielart und Kartentyp,
+   Rangliste aller Stämme mit Punkten, ausgeschiedene grau. Haben wir
+   bisher nur am Spielende.
+7. **Aufgaben/Erfolge:** eigene Ziele mit Fortschritt (z. B. Stadt auf
+   Stufe 5, 10 Siege, alle Techniken, 5 Städte per Straße verbunden,
+   100 Sterne). Eigene Namen wählen.
+8. **Einheiten-Details erweitern:** Herkunftsstadt, Fortschritt bis zum
+   Veteran (x/3 Siege), Kosten. Fähigkeiten als Chips oben, Werte als
+   Liste mit Punktlinie.
+9. **Stadt-Details:** ein Satz mit Sternen pro Runde und Punktwert, bei
+   eroberten Städten früherer Besitzer. Beim Antippen die Stadtgrenze
+   hervorheben.
+10. **Ausbilden-Knöpfe:** Preis als kleines Abzeichen oben rechts am runden
+    Bild statt Text darunter.
+11. **Forschungsdetails:** Freischaltungen als runde Symbole, jedes mit
+    eigenem ⓘ (zweite Ebene) statt Textliste. Unten ein fester Hinweis,
+    dass Forschung mit jeder Stadt teurer wird und Philosophie sie
+    verbilligt.
+12. **Zugziele deutlicher:** Im Original markieren Ringe alle erreichbaren
+    Felder großflächig. Unsere weißen Punkte sind bei weiter Zoomstufe
+    klein.
+13. **Einstellungen:** Lautstärke als Schieberegler statt nur an/aus.
+    Schalter „Tipps anzeigen“ zum Ausblenden der Hinweis-Blasen.
+14. **Stadt-Schild auf der Karte:** Einkommen (★) und Einwohner-Fortschritt
+    direkt unter dem Namen, wie bei der Stufe.

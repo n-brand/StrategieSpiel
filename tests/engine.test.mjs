@@ -681,3 +681,17 @@ describe('Straßen: weiter in Richtung der Straße, Limit je Einheit', () => {
     assert.equal(has(E.moveTargets(s, u), 5, 4), false, 'nicht über das Limit hinaus');
   });
 });
+
+describe('Auflösen', () => {
+  test('erst mit Freigeist', () => {
+    const s = world();
+    const u = unit(s, 0, 'warrior', 3, 3);
+    assert.equal(E.canDisband(s, u), false);
+    assert.deepEqual(E.disband(s, u.id), []);
+    assert.ok(s.units.includes(u));
+    s.players[0].techs.push('freespirit');
+    assert.equal(E.canDisband(s, u), true);
+    assert.equal(E.disband(s, u.id)[0].type, 'disband');
+    assert.ok(!s.units.includes(u));
+  });
+});

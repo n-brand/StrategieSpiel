@@ -6,6 +6,7 @@ import {
   START_STARS, TURN_LIMIT, TRIBES, tribeById, UNITS, NAVAL, NAVAL_UPGRADE, TECHS, ACTIONS, ADJACENCY, MARKET_SOURCES,
   isLand, isWater, DAMAGE_FACTOR, BONUS_DEFENSE, WALL_DEFENSE, VETERAN_KILLS, VETERAN_HP, SIGHT, MOUNTAIN_SIGHT,
   HEAL_OWN, HEAL_OTHER, HEAL_MIND, LITERACY, popToGrow, unitCap, rewardsFor, RUIN_REWARDS, DIFFICULTIES, SCORE,
+  DISBAND_TECH,
 } from './rules.js';
 import { generateMap } from './mapgen.js';
 import { random, pickWeighted, newSeed } from './rng.js';
@@ -640,9 +641,11 @@ export function examine(s, unitId) {
   return events;
 }
 
+export const canDisband = (s, u) => hasTech(s, u.owner, DISBAND_TECH);
+
 export function disband(s, unitId) {
   const u = unitById(s, unitId);
-  if (!u || u.owner !== s.current) return [];
+  if (!u || u.owner !== s.current || !canDisband(s, u)) return [];
   removeUnit(s, u);
   return [{ type: 'disband', unit: u.id }];
 }

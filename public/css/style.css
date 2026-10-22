@@ -527,6 +527,7 @@ button { font: inherit; color: inherit; }
   scrollbar-width: thin;
   touch-action: pan-x pan-y;
 }
+.actions:empty { display: none; }
 .actions .act { flex: 0 0 82px; scroll-snap-align: start; }
 .act {
   position: relative;
@@ -905,9 +906,23 @@ button { font: inherit; color: inherit; }
 .seg--sm { margin-left: auto; padding: 3px; border-width: 1px; }
 .seg--sm button { min-height: 30px; padding: 3px 10px; font-size: 0.82rem; }
 .menu-home { width: 100%; }
-.help h3 { margin: 16px 0 4px; font-size: 1rem; font-weight: 900; }
+.help h3 { display: flex; align-items: center; gap: 8px; margin: 14px 0 6px; font-size: 1rem; font-weight: 900; }
+.help h3 svg { width: 20px; height: 20px; flex: none; color: var(--yellow); }
 .help p, .help li { margin: 0 0 6px; color: var(--muted); font-weight: 700; }
-.help ul { padding-left: 20px; margin: 0; }
+.help ul { display: grid; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.help li { display: flex; align-items: center; gap: 10px; margin: 0; line-height: 1.35; }
+.help-ico { display: grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 50%; background: var(--card-2); color: var(--navy); }
+.help-ico svg { width: 17px; height: 17px; }
+.help li.help-stats { display: block; }
+.help b { color: var(--navy); }
+/* Menü: Symbol vor jeder Einstellung */
+.set-label { display: flex; align-items: center; gap: 9px; }
+.set-label svg { width: 20px; height: 20px; flex: none; color: var(--muted); }
+/* Fähigkeiten in den Einheiten-Details */
+.skill-list { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.skill-list li { display: flex; align-items: flex-start; gap: 8px; color: var(--muted); font-size: 0.86rem; font-weight: 700; }
+.skill-list svg { width: 18px; height: 18px; flex: none; color: var(--yellow); }
+.skill-list b { color: var(--navy); }
 
 /* ---------- Einblendungen ---------- */
 .toasts {
