@@ -144,9 +144,9 @@ export function openTechTree({ tribe, stars, state, cost, canResearch, research,
     sheet.innerHTML = `
       <svg class="tt-sheet-icon" viewBox="0 0 48 48" aria-hidden="true">${TECH_ICON_SVG[picked]}</svg>
       <div class="tt-sheet-text"><h3>${esc(tech.name)}</h3><p>${esc(about)}</p>${note ? `<p class="tt-note">${esc(note)}</p>` : ''}</div>
-      <ul class="tt-unlocks">${items
+      <details class="tt-more" ${matchMedia('(min-width: 900px) and (min-height: 560px)').matches ? 'open' : ''}><summary>${ICONS.info} Was wird freigeschaltet?</summary><ul class="tt-unlocks">${items
         .map((i) => `<li><span class="tt-kind">${esc(i.kind)}</span><b>${esc(i.name)}</b>${i.cost ? `<span class="tt-cost">${esc(i.cost)}</span>` : ''}<small>${esc(i.text)}</small></li>`)
-        .join('')}</ul>
+        .join('')}</ul></details>
       ${
         st === 'done'
           ? `<span class="pill">${ICONS.check} Erforscht</span>`

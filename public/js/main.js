@@ -440,6 +440,7 @@ function afterHumanAction() {
 
 // ---------- Auswahl-Karte ----------
 
+const infoBtn = `<button type="button" class="sheet-info" data-sheet-info aria-label="Details">${ICONS.info}</button>`;
 const closeBtn = `<button type="button" class="sheet-close" data-sheet-close aria-label="Schließen">${ICONS.close}</button>`;
 
 function renderSheet() {
@@ -464,9 +465,13 @@ function renderSheet() {
     } else html = tileSheet(tile);
   }
   sheet.style.setProperty('--c', color);
-  sheet.innerHTML = closeBtn + html;
+  sheet.innerHTML = infoBtn + closeBtn + html;
   sheet.hidden = false;
   sheet.querySelector('[data-sheet-close]').addEventListener('click', () => select(null));
+  // Handy hochkant: Werte und Hinweise stehen hinter dem Info-Knopf, die Karte bleibt klein
+  sheet.querySelector('[data-sheet-info]').addEventListener('click', () => {
+    openModal(`<h2>${esc(sheet.querySelector('.sheet-head h2').textContent)}</h2>${sheet.querySelector('.sheet-detail')?.innerHTML ?? ''}`, { className: 'modal--info' });
+  });
   sheet.querySelectorAll('[data-do]').forEach((b) => b.addEventListener('click', () => sheetAction(b.dataset.do, b.dataset.arg)));
 }
 
@@ -482,13 +487,14 @@ function unitSheet(u, tribe) {
     <div class="sheet-head">
       <img src="${unitThumb(u.naval || u.type, tribe.id)}" alt="">
       <div><h2>${esc(E.unitName(u))}${u.veteran ? ' ★' : ''}</h2><p>${esc(tribe.name)} · ${u.hp}/${u.maxHp} Lebenspunkte</p></div>
-    </div>
-    <div class="stats">${statPill('Angriff', fmt(def.atk))}${statPill('Abwehr', def.def)}${statPill('Bewegung', def.move)}${u.naval ? '' : statPill('Straße', E.roadRange(u))}${statPill('Reichweite', def.range)}${u.kills ? statPill('Siege', u.kills) : ''}</div>`;
+    </div>`;
+  const stats = `<div class="stats">${statPill('Angriff', fmt(def.atk))}${statPill('Abwehr', def.def)}${statPill('Bewegung', def.move)}${u.naval ? '' : statPill('Straße', E.roadRange(u))}${statPill('Reichweite', def.range)}${u.kills ? statPill('Siege', u.kills) : ''}</div>`;
   const naval = u.naval
     ? `<p class="sheet-note">${u.naval === 'boat' ? 'Boote fahren nur auf Flachwasser.' : 'Fährt auch auf dem Ozean.'} Zum Anlanden auf ein Landfeld ziehen – das beendet den Zug.</p>`
     : '';
   const skills = def.skills.length ? `<p class="sheet-note">${def.skills.map((k) => esc(SKILL_NAMES[k])).join(' · ')}</p>` : '';
-  if (!mine || !isHumanTurn()) return head + naval + skills;
+  const detail = (more = '') => `<div class="sheet-detail">${stats}${naval}${skills}${more}</div>`;
+  if (!mine || !isHumanTurn()) return head + detail();
   const actions = [];
   const up = E.upgradeOption(game, u);
   if (up && !up.locked) {
@@ -504,7 +510,7 @@ function unitSheet(u, tribe) {
   const status = !E.isIdle(game, u) ? '<p class="sheet-note">Diese Einheit hat in dieser Runde schon gehandelt.</p>' : '';
   const guard = E.defenseInfo(game, u);
   const guarded = guard ? `<p class="sheet-note sheet-guard">${ICONS.shield} Geschützt (${guard.reason}): Verteidigung ×${String(guard.factor).replace('.', ',')} – weniger Schaden, stärkerer Gegenschlag.</p>` : '';
-  return head + naval + skills + guarded + status + `<div class="actions">${actions.join('')}</div>`;
+  return head + detail(guarded + status) + `<div class="actions">${actions.join('')}</div>`;
 }
 
 function actionButton(action, arg, icon, title, sub, primary = false, disabled = false, img = null) {
@@ -524,12 +530,12 @@ function citySheet(city) {
       <div><h2>${esc(city.name)}</h2><p>${esc(tribe.name)} · Stufe ${city.level}${extras.length ? ` · ${esc(extras.join(', '))}` : ''}</p></div>
     </div>
     <div class="progress" title="Einwohner bis zur nächsten Stufe">${Array.from({ length: need }, (_, i) => `<span class="${i < city.pop ? 'is-full' : ''}"></span>`).join('')}</div>
-    <div class="stats">${statPill('Einwohner', `${city.pop}/${need}`)}${statPill('Einkommen', `+${E.cityIncome(game, city)}`)}${statPill('Einheiten', `${units}/${unitCap(city.level)}`)}</div>`;
+    <div class="sheet-detail"><div class="stats">${statPill('Einwohner', `${city.pop}/${need}`)}${statPill('Einkommen', `+${E.cityIncome(game, city)}`)}${statPill('Einheiten', `${units}/${unitCap(city.level)}`)}</div></div>`;
   if (E.besieged(game, city)) html += '<p class="sheet-note is-warn">Belagert: Ein Gegner steht in der Stadt – kein Einkommen.</p>';
   if (!mine || !isHumanTurn()) return html;
   if (city.pending.length) html += `<div class="actions">${actionButton('reward', city.id, ICONS.up, 'Belohnung wählen', `Stufe ${city.pending[0]}`, true)}</div>`;
   const opts = E.trainOptions(game, city);
-  html += `<p class="sheet-note">Einheit ausbilden:</p><div class="actions">${opts
+  html += `<p class="sheet-note sheet-label">Einheit ausbilden:</p><div class="actions">${opts
     .filter((o) => !o.locked) // nur Freigeschaltetes
     .map((o) => {
       const sub = o.locked ? `${ICONS.lock} ${esc(o.reason.replace('Braucht ', ''))}` : `<span class="cost">${starAmount(o.cost)}</span>${o.ok ? '' : ` · ${esc(o.reason)}`}`;
@@ -554,9 +560,11 @@ function tileSheet(tile) {
       <img src="${tileThumb(tile, ownerTribe)}" alt="">
       <div><h2>${esc(title)}</h2><p>${esc(parts.join(' · ') || TERRAIN_NAMES[tile.terrain])}</p></div>
     </div>`;
-  if (tile.village) html += '<p class="sheet-note">Stell eine Einheit auf das Dorf und nimm es in der nächsten Runde ein – dann wird es deine Stadt.</p>';
-  if (tile.ruin) html += '<p class="sheet-note">Schick eine Einheit hierher und erkunde die Ruine.</p>';
-  if (tile.terrain === 'mountain' && !E.hasTech(game, HUMAN, 'climbing')) html += '<p class="sheet-note">Berge kann man erst mit Klettern betreten.</p>';
+  let notes = '';
+  if (tile.village) notes += '<p class="sheet-note">Stell eine Einheit auf das Dorf und nimm es in der nächsten Runde ein – dann wird es deine Stadt.</p>';
+  if (tile.ruin) notes += '<p class="sheet-note">Schick eine Einheit hierher und erkunde die Ruine.</p>';
+  if (tile.terrain === 'mountain' && !E.hasTech(game, HUMAN, 'climbing')) notes += '<p class="sheet-note">Berge kann man erst mit Klettern betreten.</p>';
+  html += `<div class="sheet-detail">${notes}</div>`;
   if (ownerP === HUMAN && isHumanTurn()) {
     const acts = E.tileActions(game, HUMAN, tile).filter((a) => !a.locked); // nur Freigeschaltetes
     if (acts.length) {
