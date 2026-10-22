@@ -491,6 +491,9 @@ button { font: inherit; color: inherit; }
 .sheet-close svg, .sheet-info svg { width: 20px; height: 20px; }
 /* Handy hochkant: Werte und Hinweise nur über den Info-Knopf, Karte bleibt klein */
 .sheet .sheet-detail, .sheet .sheet-label { display: none; }
+/* Handy hochkant: Bei einer Auswahl verschwindet die untere Leiste, die Karte rückt nach unten */
+.has-sheet .dock { display: none; }
+.has-sheet .sheet { bottom: calc(var(--sab) + 8px); }
 .modal--info .stats { margin-bottom: 4px; }
 .modal--info .sheet-note:first-child { margin-top: 0; }
 .stats { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
@@ -985,6 +988,8 @@ button { font: inherit; color: inherit; }
   }
   .sheet .sheet-detail, .sheet .sheet-label { display: block; }
   .sheet-info { display: none; }
+  .has-sheet .dock { display: flex; }
+  .has-sheet .sheet { bottom: calc(var(--sab) + 66px); }
   .sheet-head { padding-right: 34px; }
   .actions { gap: 8px; }
   .dock .btn { min-height: 42px; }
@@ -1022,6 +1027,8 @@ button { font: inherit; color: inherit; }
   }
   .sheet .sheet-detail, .sheet .sheet-label { display: block; }
   .sheet-info { display: none; }
+  .has-sheet .dock { display: flex; }
+  .has-sheet .sheet { bottom: 96px; }
   .sheet-head { padding-right: 34px; }
   .modal-backdrop { align-items: center; padding: 24px; }
   .modal { width: min(100%, 560px); border-radius: 24px; padding: 26px; box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25); }

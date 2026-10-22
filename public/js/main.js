@@ -447,6 +447,7 @@ function renderSheet() {
   const sheet = dom.sheet;
   if (!selection || !game) {
     sheet.hidden = true;
+    dom.root.classList.remove('has-sheet');
     return;
   }
   let html = '';
@@ -467,6 +468,7 @@ function renderSheet() {
   sheet.style.setProperty('--c', color);
   sheet.innerHTML = infoBtn + closeBtn + html;
   sheet.hidden = false;
+  dom.root.classList.add('has-sheet'); // Handy hochkant: Karte ersetzt die untere Leiste
   sheet.querySelector('[data-sheet-close]').addEventListener('click', () => select(null));
   // Handy hochkant: Werte und Hinweise stehen hinter dem Info-Knopf, die Karte bleibt klein
   sheet.querySelector('[data-sheet-info]').addEventListener('click', () => {

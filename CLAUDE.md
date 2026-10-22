@@ -190,10 +190,9 @@ auf allen Kartentypen.
 Nur Aufbau und Bedienung übernehmen, keine Grafiken, Texte oder Namen.
 Ungefähr nach Nutzen sortiert:
 
-1. **Untere Leiste bei Auswahl ersetzen:** Im Original verschwindet die
-   Leiste, sobald etwas gewählt ist. Dann stehen unten nur noch Infozeile
-   und Aktionen. Bei uns liegen Karte und „Forschung/Runde beenden“
-   übereinander, das kostet rund 60 px Karte.
+1. ~~Untere Leiste bei Auswahl ersetzen~~ – erledigt: Auf dem Handy
+   hochkant blendet eine Auswahl „Forschung/Runde beenden“ aus
+   (`.has-sheet`), die Karte rückt nach unten.
 2. **Anweisung in der Auswahl-Karte:** Statt der Blase „Weiß = ziehen“ oben
    steht im Original eine Zeile in der Karte („Wähle ein Feld …“). Eine
    Zeile spart die Blase und erklärt den nächsten Schritt.
