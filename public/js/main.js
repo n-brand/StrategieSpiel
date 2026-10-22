@@ -243,7 +243,7 @@ function startGame(s) {
         <div class="hud-box hud-stars" data-stars></div>
         <div class="hud-box" data-turn></div>
         <div class="hud-spacer"></div>
-        <div class="hud-box" data-score></div>
+        <button type="button" class="hud-box hud-score" data-score aria-label="Statistik"></button>
       </header>
       <div class="sheet" data-sheet hidden></div>
       <div class="ai-banner" data-ai hidden></div>
@@ -284,6 +284,7 @@ function startGame(s) {
 
   root.querySelector('[data-menu]').addEventListener('click', openMenu);
   root.querySelector('[data-tech]').addEventListener('click', openTechTree);
+  dom.score.addEventListener('click', () => !modalOpen() && openStats());
   dom.end.addEventListener('click', requestEndTurn);
   updateHud();
   saveGame();
@@ -762,6 +763,56 @@ async function runBots() {
   afterHumanAction();
 }
 
+// ---------- Statistik (im Spiel) ----------
+
+// Punkte-Teile mit Symbol, auch fürs Spielende
+const SCORE_PARTS = {
+  explore: ['Erkundung', 'eye'],
+  territory: ['Gebiet', 'flag'],
+  cities: ['Städte', 'people'],
+  tech: ['Forschung', 'flask'],
+  army: ['Armee', 'sword'],
+  temples: ['Tempel', 'sparkle'],
+  parks: ['Parks', 'heart'],
+};
+const scorePartsHtml = (parts) =>
+  `<dl class="score-parts">${Object.entries(parts)
+    .map(([k, v]) => `<dt>${ICONS[SCORE_PARTS[k][1]]}${SCORE_PARTS[k][0]}</dt><dd>${fmt(v)}</dd>`)
+    .join('')}</dl>`;
+
+function openStats() {
+  const perfection = game.mode === 'perfection';
+  const chip = (icon, text, title) => `<span class="stat" title="${title}">${ICONS[icon]}<b>${esc(text)}</b></span>`;
+  const ranking = game.players
+    .map((p, i) => ({ i, p, tribe: tribeById(p.tribe), score: E.scoreOf(game, i).total }))
+    .sort((a, b) => b.p.alive - a.p.alive || b.score - a.score);
+  const row = (r, n) => {
+    const cities = E.playerCities(game, r.i).length;
+    const units = E.playerUnits(game, r.i).length;
+    const sub = r.p.alive
+      ? `<span title="Städte">${ICONS.people}${cities}</span><span title="Einheiten">${ICONS.pawn}${units}</span><span title="Techniken">${ICONS.flask}${r.p.techs.length}</span>`
+      : 'Besiegt';
+    return `<div class="rank ${r.i === HUMAN ? 'is-you' : ''} ${r.p.alive ? '' : 'is-out'}" style="--c:${r.tribe.color}">
+      <span>${r.p.alive ? `${n + 1}.` : '✝'}</span><i></i>
+      <div class="rank-name">${esc(r.tribe.name)}${r.i === HUMAN ? ' <small class="rank-you">Du</small>' : ''}<small class="rank-sub">${sub}</small></div>
+      <b>${r.p.alive ? fmt(r.score) : '–'}</b></div>`;
+  };
+  openModal(
+    `<h2>Statistik</h2>
+     <div class="stats stats--game">
+       ${chip(perfection ? 'trophy' : 'swords', perfection ? `${game.turnLimit} Runden` : 'Eroberung', 'Spielart')}
+       ${chip('mountain', MAP_TYPES[game.mapType]?.name || '', 'Landschaft')}
+       ${chip('bolt', DIFFICULTIES[game.difficulty]?.name || '', 'Gegner')}
+       ${chip('up', perfection ? `Runde ${Math.min(game.turn, game.turnLimit)}/${game.turnLimit}` : `Runde ${game.turn}`, 'Runde')}
+     </div>
+     <h3 class="modal-sub">Punkte</h3>
+     <div class="ranking">${ranking.map(row).join('')}</div>
+     <h3 class="modal-sub">Deine Punkte</h3>
+     ${scorePartsHtml(E.scoreOf(game, HUMAN).parts)}`,
+    { className: 'modal--stats' },
+  );
+}
+
 // ---------- Spielende ----------
 
 function showGameOver() {
@@ -777,14 +828,12 @@ function showGameOver() {
   const ranking = game.players
     .map((p, i) => ({ i, tribe: tribeById(p.tribe), score: over.scores[i], alive: p.alive }))
     .sort((a, b) => b.score - a.score);
-  const parts = E.scoreOf(game, HUMAN).parts;
-  const names = { explore: 'Erkundung', territory: 'Gebiet', cities: 'Städte', tech: 'Forschung', army: 'Armee', temples: 'Tempel', parks: 'Parks' };
   const { el } = openModal(
     `<h2>${title}</h2><p class="modal-text">${esc(reason)}</p>
      <div class="ranking">${ranking
        .map((r, n) => `<div class="rank ${r.i === HUMAN ? 'is-you' : ''}" style="--c:${r.tribe.color}"><span>${n + 1}.</span><i></i>${esc(r.tribe.name)}${r.alive ? '' : ' ✝'}<b>${fmt(r.score)}</b></div>`)
        .join('')}</div>
-     <dl class="score-parts">${Object.entries(parts).map(([k, v]) => `<dt>${names[k]}</dt><dd>${fmt(v)}</dd>`).join('')}</dl>
+     ${scorePartsHtml(E.scoreOf(game, HUMAN).parts)}
      <div class="modal-actions"><button type="button" class="btn" data-close>Karte ansehen</button><button type="button" class="btn btn--primary" data-new>Neues Spiel</button></div>`,
   );
   el.querySelector('[data-new]').addEventListener('click', () => {
@@ -815,6 +864,7 @@ function openMenu() {
     `<h2>Menü</h2>
     <div class="menu-top">
       <button type="button" class="btn btn--primary" data-close>Weiterspielen</button>
+      <button type="button" class="btn" data-stats>${ICONS.trophy}Statistik</button>
       <button type="button" class="btn" data-help>So wird gespielt</button>
     </div>
     <div class="menu-settings">
@@ -829,6 +879,10 @@ function openMenu() {
     <p class="credit credit--menu">StrategieSpiel · von Nicolas Brand</p>`,
     { className: 'modal--menu' },
   );
+  el.querySelector('[data-stats]').addEventListener('click', () => {
+    close();
+    openStats();
+  });
   el.querySelector('[data-help]').addEventListener('click', () => {
     close();
     openHelp();

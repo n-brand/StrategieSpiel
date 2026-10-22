@@ -852,15 +852,29 @@ button { font: inherit; color: inherit; }
 .rank i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); }
 .rank b { margin-left: auto; font-variant-numeric: tabular-nums; }
 .rank.is-you { box-shadow: inset 0 0 0 2px var(--yellow); }
+.rank.is-out { opacity: 0.5; }
+.rank-name { display: flex; flex-direction: column; min-width: 0; }
+.rank-you { color: var(--yellow); font-size: 0.72rem; font-weight: 900; }
+.rank-sub { display: flex; gap: 10px; color: var(--muted); font-size: 0.78rem; font-weight: 800; }
+.rank-sub span { display: inline-flex; align-items: center; gap: 3px; }
+.rank-sub svg { width: 14px; height: 14px; }
+.modal-sub { margin: 16px 0 6px; font-size: 1rem; font-weight: 900; }
+.stats--game { margin-top: 8px; }
+.stats--game svg { color: var(--muted); }
+/* Punkte oben: antippen öffnet die Statistik */
+.hud-score { color: inherit; font: inherit; cursor: pointer; }
 .score-parts { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; margin: 12px 0 0; font-size: 0.9rem; font-weight: 700; }
 .score-parts dd { margin: 0; text-align: right; font-weight: 900; }
-.score-parts dt { color: var(--muted); }
+.score-parts dt { display: flex; align-items: center; gap: 7px; color: var(--muted); }
+.score-parts dt svg { width: 15px; height: 15px; flex: none; }
 
 .menu-list { display: grid; gap: 10px; }
 
 /* Kompaktes Menü: zwei Knöpfe oben, darunter Einstellungen als schlanke Liste mit Schaltern */
 .menu-top { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
 .menu-top .btn { min-height: 42px; padding: 8px 10px; font-size: 0.92rem; }
+.menu-top .btn--primary { grid-column: 1 / -1; }
+.menu-top .btn svg { width: 17px; height: 17px; }
 .menu-settings { display: grid; margin: 14px 0 12px; padding: 0 14px; border-radius: 16px; background: var(--card-2); }
 .set-row {
   display: flex;

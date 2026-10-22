@@ -178,7 +178,10 @@ auf allen Kartentypen.
   - Mehr Symbole statt Text: Hilfe als Symbolzeilen, Menü-Einstellungen
     mit Symbolen, Gegner-Tempo 1×/2×/4×, Fähigkeiten mit Symbol.
 - **Auflösen:** erst mit Freigeist (`DISBAND_TECH`, `canDisband`).
-- **Tests:** 127 Unit-Tests, Simulation ohne Regelverstöße.
+- **Einnehmen:** Die Einheit gehört danach zur eingenommenen Stadt
+  (`u.home`), in ihrer alten Stadt wird ein Platz frei.
+- **Statistik:** Tippen auf die Punkte oben öffnet sie (auch im Menü).
+- **Tests:** 128 Unit-Tests, Simulation ohne Regelverstöße.
 
 ## Offen
 
@@ -208,9 +211,10 @@ Ungefähr nach Nutzen sortiert:
 5. **Obere Leiste schlanker:** Im Original nur Text mit kleiner
    Überschrift (Punkte, Sterne +Einkommen, Runde), ohne Kästen, mittig.
    Unsere Kästen sind gut lesbar, verdecken aber mehr.
-6. **Neuer Bildschirm Statistik (im Spiel):** Spielart und Kartentyp,
-   Rangliste aller Stämme mit Punkten, ausgeschiedene grau. Haben wir
-   bisher nur am Spielende.
+6. ~~Statistik im Spiel~~ – erledigt: `openStats()`, erreichbar über die
+   Punkte oben rechts und das Menü. Zeigt Spielart, Landschaft, Gegner,
+   Runde, Rangliste (Städte, Einheiten, Techniken je Stamm) und die eigenen
+   Punkte nach Teilen.
 7. **Aufgaben/Erfolge:** eigene Ziele mit Fortschritt (z. B. Stadt auf
    Stufe 5, 10 Siege, alle Techniken, 5 Städte per Straße verbunden,
    100 Sterne). Eigene Namen wählen.
